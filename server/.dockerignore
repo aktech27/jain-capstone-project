@@ -1,0 +1,14 @@
+# Maven / Java ignores
+*.log
+target/
+!target/*.jar
+
+# Local env
+.env
+
+# OS / IDE stuff
+.DS_Store
+*.swp
+.vscode
+.idea
+*.iml

@@ -1,0 +1,65 @@
+services:
+  web:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: banking-web
+    env_file:
+      - ./client/.env
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    command: npm run dev
+    develop:
+      watch:
+        - path: ./client/package.json
+          action: rebuild
+        - path: ./client/package-lock.json
+          action: rebuild
+        - path: ./client
+          target: /app
+          action: sync
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: banking-api
+    env_file:
+      - ./server/.env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    volumes:
+      - ./server:/app
+      - ~/.m2:/root/.m2
+    working_dir: /app
+    command: ./mvnw spring-boot:run
+    develop:
+      watch:
+        - path: ./server/pom.xml
+          action: rebuild
+        - path: ./server/src
+          target: /app/src
+          action: sync
+    restart: unless-stopped
+
+
+  db:
+    image: postgres:17-alpine
+    container_name: banking-db
+    env_file:
+      - ./server/.env
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  db_data:

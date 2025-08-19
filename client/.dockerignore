@@ -1,0 +1,16 @@
+# Node / React ignores
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Local env & build artifacts
+.env
+dist
+build
+
+# OS / IDE stuff
+.DS_Store
+*.swp
+.vscode
+.idea
