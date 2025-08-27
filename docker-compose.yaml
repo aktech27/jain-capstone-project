@@ -45,6 +45,8 @@ services:
       watch:
         - path: ./server/pom.xml
           action: rebuild
+        - path: ./server/.env
+          action: rebuild
         - path: ./server/src
           target: /app/src
           action: sync
@@ -59,7 +61,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5434:5432"
 
 volumes:
   db_data:
