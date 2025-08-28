@@ -2,37 +2,36 @@ package com.capstone.bankingapp.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "admin_users")
+@Table(name = "kyc_details")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AdminUser {
+public class KycDetails {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false, unique = true, length = 50)
-  private String username;
+  @Column(name = "doc_number", nullable = false, unique = true, length = 30)
+  private String docNumber;
 
-  @Column(nullable = false)
-  private String password;
+  @Column(name = "doc_url", nullable = false, length = 200)
+  private String docUrl;
 
-  @Column(nullable = false, unique = true, length = 100)
-  private String email;
-
-  @Column(length = 100)
-  private String name;
-
-  @Column(nullable = false, length = 20)
-  private String role;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "doc_type")
+  private DocumentType documentType;
 
   @Builder.Default
-  @Column(name = "is_2fa_enabled", nullable = false)
-  private Boolean is2FaEnabled = false;
+  @Column(name = "is_verified", nullable = false)
+  private Boolean isVerified = false;
+
+  @Column(name = "reject_reason", columnDefinition = "TEXT")
+  private String rejectReason;
 
   @Builder.Default
   @Column(name = "is_deleted", nullable = false)
@@ -47,6 +46,10 @@ public class AdminUser {
   @Column(name = "deleted_at")
   private LocalDateTime deletedAt;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "customer_information_id", nullable = false)
+  private CustomerInformation customerInformation;
+
   @PrePersist
   protected void onCreate() {
     this.createdAt = LocalDateTime.now();
@@ -58,4 +61,7 @@ public class AdminUser {
     this.updatedAt = LocalDateTime.now();
   }
 
+  public enum DocumentType {
+    AADHAAR, PAN, PHOTO
+  }
 }
