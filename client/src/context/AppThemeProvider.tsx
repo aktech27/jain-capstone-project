@@ -4,13 +4,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { maintheme, mainthemeDark } from "@/utils/theme";
 
 import type { PropsWithChildren } from "react";
-
-export type ThemeName = "default" | "default-dark";
-
-export interface IAppThemeContextProps {
-  theme: ThemeName;
-  setTheme: React.Dispatch<React.SetStateAction<ThemeName>>;
-}
+import type { IAppThemeContextProps, ThemeName } from "@/types/context";
 
 export const AppThemeContext = createContext<IAppThemeContextProps>({
   theme: "default",
