@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter } from "react-router";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { SnackbarProvider } from "notistack";
 
 import AppRoutes from "@/routes/AppRoutes";
 import AppThemeProvider from "@/context/AppThemeProvider";
@@ -17,7 +18,15 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <AppThemeProvider>
             <GlobalContextProvider>
-              <AppRoutes />
+              <SnackbarProvider
+                anchorOrigin={{
+                  horizontal: "right",
+                  vertical: "top",
+                }}
+                autoHideDuration={3000}
+              >
+                <AppRoutes />
+              </SnackbarProvider>
             </GlobalContextProvider>
           </AppThemeProvider>
         </QueryClientProvider>

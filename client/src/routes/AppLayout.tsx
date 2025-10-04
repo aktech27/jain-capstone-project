@@ -3,20 +3,10 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { useEffect, useState } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router";
+import { Outlet } from "react-router";
 
 const AppLayout = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    console.log(location.pathname);
-    if (!isLoggedIn) {
-      navigate("/auth/login");
-    }
-  }, [location.pathname]);
 
   useEffect(() => {
     function handleWindowResize() {

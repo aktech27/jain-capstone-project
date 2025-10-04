@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
@@ -6,12 +7,20 @@ import Typography from "@mui/material/Typography";
 import LoginIcon from "@mui/icons-material/Login";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSnackbar } from "notistack";
+import { useNavigate } from "react-router";
 
 import { adminLoginSchema } from "@/helpers/schema/auth";
+import { adminLogin } from "@/services/auth";
+import { GlobalContext } from "@/context/GlobalContext";
 
 import type { AdminLoginSchema } from "@/helpers/schema/auth";
 
 const AdminLoginForm: React.FC = () => {
+  const { enqueueSnackbar } = useSnackbar();
+  const { dispatch } = useContext(GlobalContext)!;
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -21,7 +30,34 @@ const AdminLoginForm: React.FC = () => {
     resolver: zodResolver(adminLoginSchema),
   });
 
-  const onSubmit = (data: AdminLoginSchema) => console.log(data);
+  const onSubmit = async (data: AdminLoginSchema) => {
+    try {
+      console.debug("Admin Login Data", data);
+      const response = await adminLogin(data.username, data.password);
+      if (!response?.isSuccessful) {
+        enqueueSnackbar(response?.message, {
+          variant: "error",
+        });
+      } else {
+        enqueueSnackbar(response?.message, {
+          variant: "success",
+        });
+        dispatch({
+          type: "ADMIN_LOGIN",
+          payload: {
+            email: response.data?.userDetails?.email,
+            name: response.data?.userDetails?.name,
+            username: response.data?.userDetails?.username,
+          },
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      enqueueSnackbar("Something went wrong", {
+        variant: "error",
+      });
+    }
+  };
 
   return (
     <Box
@@ -46,15 +82,15 @@ const AdminLoginForm: React.FC = () => {
 
       <TextField
         variant="outlined"
-        label="Email"
-        id="email"
-        type="email"
+        label="Username"
+        id="username"
+        type="username"
         required
         fullWidth
         margin="normal"
-        {...register("email")}
-        error={!!errors?.email}
-        helperText={errors.email?.message}
+        {...register("username")}
+        error={!!errors?.username}
+        helperText={errors.username?.message}
       />
 
       <TextField

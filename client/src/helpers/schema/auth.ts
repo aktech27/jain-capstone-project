@@ -1,7 +1,7 @@
 import * as z from "zod";
 
 export const adminLoginSchema = z.object({
-  email: z.email(),
+  username: z.string().trim().nonempty("Username is required"),
   password: z.string().nonempty("Password is required"),
 });
 

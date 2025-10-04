@@ -6,7 +6,7 @@ export interface IAppThemeContextProps {
 }
 
 export interface IGlobalState {
-  auth: Record<string, any>;
+  auth: IGlobalAuthState;
   dashboard: Record<string, any>;
   transaction: Record<string, any>;
   error: string | null;
@@ -14,7 +14,7 @@ export interface IGlobalState {
 }
 
 export type GlobalStateAction =
-  | { type: "SET_AUTH"; payload: Record<string, any> }
+  | { type: "ADMIN_LOGIN"; payload: IGlobalAuthState }
   | { type: "SET_DASHBOARD"; payload: Record<string, any> }
   | { type: "SET_TRANSACTION"; payload: Record<string, any> }
   | { type: "SET_ERROR"; payload: string | null }
@@ -22,5 +22,13 @@ export type GlobalStateAction =
 
 export interface IGlobalContextProps {
   globalState: IGlobalState;
-  dispatch: React.Dispatch<IGlobalStateAction>;
+  dispatch: React.Dispatch<GlobalStateAction>;
+}
+
+export interface IGlobalAuthState {
+  isLoggedIn?: boolean;
+  username?: string;
+  email?: string;
+  name?: string;
+  role?: "Admin" | "Customer";
 }

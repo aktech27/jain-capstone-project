@@ -6,7 +6,9 @@ import type { PropsWithChildren } from "react";
 import type { IGlobalState, IGlobalContextProps } from "@/types/context";
 
 export const DEFAULT_GLOBAL_STATE: IGlobalState = {
-  auth: {},
+  auth: {
+    isLoggedIn: false,
+  },
   dashboard: {},
   transaction: {},
   error: null,
