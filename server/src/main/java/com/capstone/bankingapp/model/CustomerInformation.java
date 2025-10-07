@@ -8,6 +8,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 @Entity
 @Table(name = "customer_information")
 @Data
@@ -48,10 +51,12 @@ public class CustomerInformation {
   @Column(name = "gender", nullable = false)
   private Gender gender;
 
-  @Column(name = "current_address", columnDefinition = "jsonb")
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(name = "current_address", columnDefinition = "json")
   private String currentAddress;
 
-  @Column(name = "permanent_address", columnDefinition = "jsonb")
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(name = "permanent_address", columnDefinition = "json")
   private String permanentAddress;
 
   @Column(name = "nominee_name")
