@@ -35,6 +35,8 @@ services:
       - db
     volumes:
       - ~/.m2:/root/.m2
+      - ./server:/app
+      - kyc_uploads:/app/uploads
     working_dir: /app
     command: ./mvnw spring-boot:run
     develop:
@@ -61,3 +63,4 @@ services:
 
 volumes:
   db_data:
+  kyc_uploads:

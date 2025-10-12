@@ -39,3 +39,6 @@ client/node_modules/
 client/build/
 client/.env
 client/.cache
+
+#file-uploads
+uploads/
