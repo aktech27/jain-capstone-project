@@ -24,4 +24,6 @@ public interface KycRepository extends JpaRepository<KycDetails, Long> {
 
   List<KycDetails> findAllByIsDeletedTrue();
 
+  List<KycDetails> findByIsDeletedFalse();
+
 }

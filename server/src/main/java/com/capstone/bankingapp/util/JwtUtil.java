@@ -7,8 +7,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
+
 import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
@@ -34,5 +34,34 @@ public class JwtUtil {
         .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
         .signWith(secretKey, SignatureAlgorithm.HS256)
         .compact();
+  }
+
+  public boolean validateToken(String token) {
+    try {
+      Jwts.parserBuilder()
+          .setSigningKey(secretKey)
+          .build()
+          .parseClaimsJws(token);
+      return true;
+    } catch (JwtException | IllegalArgumentException e) {
+      return false;
+    }
+  }
+
+  public String extractUsername(String token) {
+    return Jwts.parserBuilder()
+        .setSigningKey(secretKey)
+        .build()
+        .parseClaimsJws(token)
+        .getBody()
+        .getSubject();
+  }
+
+  public Claims extractAllClaims(String token) {
+    return Jwts.parserBuilder()
+        .setSigningKey(secretKey)
+        .build()
+        .parseClaimsJws(token)
+        .getBody();
   }
 }

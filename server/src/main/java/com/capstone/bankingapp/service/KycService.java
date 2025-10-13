@@ -1,11 +1,15 @@
 package com.capstone.bankingapp.service;
 
 import com.capstone.bankingapp.dto.request.KycMetadataRequest;
+import com.capstone.bankingapp.dto.response.KycAdminListResponse;
+import com.capstone.bankingapp.dto.response.KycListResponse;
 import com.capstone.bankingapp.model.CustomerInformation;
 import com.capstone.bankingapp.model.KycDetails;
 import com.capstone.bankingapp.repository.CustomerInformationRepository;
 import com.capstone.bankingapp.repository.KycRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +21,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class KycService {
 
   private final KycRepository kycRepository;
@@ -86,5 +91,47 @@ public class KycService {
 
   public boolean isDocNumberAlreadyUsed(String docNumber) {
     return kycRepository.existsByDocNumberAndIsDeletedFalse(docNumber);
+  }
+
+  public List<KycListResponse> getDocumentsByCustomerId(Long customerId) {
+    log.info("Fetching all KYC documents for customer ID: {}", customerId);
+
+    List<KycDetails> documents = kycRepository.findAllByCustomerInformationIdAndIsDeletedFalse(customerId);
+
+    return documents.stream()
+        .map(doc -> KycListResponse.builder()
+            .id(doc.getId())
+            .docNumber(doc.getDocNumber())
+            .docUrl(doc.getDocUrl())
+            .documentType(doc.getDocumentType())
+            .isVerified(doc.getIsVerified())
+            .rejectReason(doc.getRejectReason())
+            .createdAt(doc.getCreatedAt())
+            .updatedAt(doc.getUpdatedAt())
+            .build())
+        .toList();
+  }
+
+  public List<KycAdminListResponse> getAllKycDocuments() {
+    log.info("Fetching all KYC documents (admin view)");
+
+    List<KycDetails> documents = kycRepository.findByIsDeletedFalse();
+
+    return documents.stream()
+        .map(doc -> KycAdminListResponse.builder()
+            .id(doc.getId())
+            .docNumber(doc.getDocNumber())
+            .docUrl(doc.getDocUrl())
+            .documentType(doc.getDocumentType())
+            .isVerified(doc.getIsVerified())
+            .rejectReason(doc.getRejectReason())
+            .createdAt(doc.getCreatedAt())
+            .updatedAt(doc.getUpdatedAt())
+            .customerId(doc.getCustomerInformation().getId())
+            .customerName(doc.getCustomerInformation().getName())
+            .customerEmail(doc.getCustomerInformation().getEmail())
+            .customerPhone(doc.getCustomerInformation().getPhone())
+            .build())
+        .toList();
   }
 }
