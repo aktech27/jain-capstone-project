@@ -38,7 +38,8 @@ public class SecurityConfig {
         .cors(cors -> {
         })
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/v1/auth/**", "/health-check", "/api/v1/kyc/upload-doc").permitAll()
+            .requestMatchers("/api/v1/auth/**", "/health-check", "/api/v1/kyc/upload-doc", "/api/v1/kyc/doc-status")
+            .permitAll()
             .anyRequest().authenticated())
         .exceptionHandling(ex -> ex
             .authenticationEntryPoint((request, response, authException) -> {

@@ -2,11 +2,15 @@
 package com.capstone.bankingapp.controller;
 
 import com.capstone.bankingapp.dto.request.KycMetadataRequest;
+import com.capstone.bankingapp.dto.request.KycStatusRequest;
+import com.capstone.bankingapp.dto.request.KycVerifyRequest;
 import com.capstone.bankingapp.dto.request.KycViewRequest;
 import com.capstone.bankingapp.dto.response.ApiResponse;
 import com.capstone.bankingapp.dto.response.KycAdminListResponse;
 import com.capstone.bankingapp.dto.response.KycListResponse;
+import com.capstone.bankingapp.dto.response.KycStatusResponse;
 import com.capstone.bankingapp.dto.response.KycUploadResponse;
+import com.capstone.bankingapp.dto.response.KycVerifyResponse;
 import com.capstone.bankingapp.model.KycDetails;
 import com.capstone.bankingapp.service.KycService;
 
@@ -118,5 +122,32 @@ public class KycController {
       return ResponseEntity.status(500)
           .body("Error reading file: " + e.getMessage());
     }
+  }
+
+  @PostMapping("/verify")
+  public ResponseEntity<ApiResponse<KycVerifyResponse>> verifyKyc(@RequestBody KycVerifyRequest request) {
+    try {
+      log.info("Verifying KYC document ID: {}, verified: {}", request.getKycId(), request.isVerified());
+      KycVerifyResponse response = kycService.verifyKycDocument(request);
+      return ResponseEntity.ok(new ApiResponse<>(true, "KYC verification updated", response));
+    } catch (RuntimeException e) {
+      log.error("Error verifying KYC document: {}", e.getMessage());
+      return ResponseEntity.status(404).body(new ApiResponse<>(false, e.getMessage(), null));
+    } catch (Exception e) {
+      log.error("Unexpected error during KYC verification", e);
+      return ResponseEntity.status(500).body(new ApiResponse<>(false, "Internal server error", null));
+    }
+  }
+
+  @PostMapping("/doc-status")
+  public ResponseEntity<ApiResponse<List<KycStatusResponse>>> getKycStatus(@RequestBody KycStatusRequest request) {
+    log.info("Fetching KYC status for email: {} or phone: {}", request.getEmail(), request.getPhone());
+
+    List<KycStatusResponse> statusList = kycService.getKycStatusByEmailOrPhone(
+        request.getEmail(),
+        request.getPhone());
+
+    return ResponseEntity.ok(
+        new ApiResponse<>(true, "KYC status fetched successfully", statusList));
   }
 }

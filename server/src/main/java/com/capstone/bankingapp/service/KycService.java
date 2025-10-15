@@ -1,8 +1,11 @@
 package com.capstone.bankingapp.service;
 
 import com.capstone.bankingapp.dto.request.KycMetadataRequest;
+import com.capstone.bankingapp.dto.request.KycVerifyRequest;
 import com.capstone.bankingapp.dto.response.KycAdminListResponse;
 import com.capstone.bankingapp.dto.response.KycListResponse;
+import com.capstone.bankingapp.dto.response.KycStatusResponse;
+import com.capstone.bankingapp.dto.response.KycVerifyResponse;
 import com.capstone.bankingapp.model.CustomerInformation;
 import com.capstone.bankingapp.model.KycDetails;
 import com.capstone.bankingapp.repository.CustomerInformationRepository;
@@ -15,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -131,6 +135,61 @@ public class KycService {
             .customerName(doc.getCustomerInformation().getName())
             .customerEmail(doc.getCustomerInformation().getEmail())
             .customerPhone(doc.getCustomerInformation().getPhone())
+            .build())
+        .toList();
+  }
+
+  public KycVerifyResponse verifyKycDocument(KycVerifyRequest request) {
+    Optional<KycDetails> optionalKyc = kycRepository.findById(request.getKycId());
+
+    if (optionalKyc.isEmpty()) {
+      throw new RuntimeException("KYC record not found with ID: " + request.getKycId());
+    }
+
+    KycDetails kyc = optionalKyc.get();
+
+    if (request.isVerified()) {
+      kyc.setIsVerified(true);
+      kyc.setRejectReason(null);
+    } else {
+      kyc.setIsVerified(false);
+      kyc.setRejectReason(request.getRejectReason());
+    }
+
+    kyc.setUpdatedAt(LocalDateTime.now());
+    kycRepository.save(kyc);
+
+    String message = request.isVerified() ? "KYC document verified successfully" : "KYC document rejected";
+
+    return new KycVerifyResponse(kyc.getId(), kyc.getIsVerified(), kyc.getRejectReason(), message);
+  }
+
+  public List<KycStatusResponse> getKycStatusByEmailOrPhone(String email, String phone) {
+    Optional<CustomerInformation> customerOpt = Optional.empty();
+
+    if (email != null && !email.isBlank()) {
+      customerOpt = customerInformationRepository.findByEmail(email);
+    } else if (phone != null && !phone.isBlank()) {
+      customerOpt = customerInformationRepository.findByPhone(phone);
+    }
+
+    if (customerOpt.isEmpty()) {
+      throw new RuntimeException("Customer not found for given email or phone");
+    }
+
+    CustomerInformation customer = customerOpt.get();
+    List<KycDetails> docs = kycRepository.findByCustomerInformationIdAndIsDeletedFalse(customer.getId());
+
+    return docs.stream()
+        .map(doc -> KycStatusResponse.builder()
+            .id(doc.getId())
+            .docNumber(doc.getDocNumber())
+            .docUrl(doc.getDocUrl())
+            .documentType(doc.getDocumentType())
+            .isVerified(doc.getIsVerified())
+            .rejectReason(doc.getRejectReason())
+            .createdAt(doc.getCreatedAt())
+            .updatedAt(doc.getUpdatedAt())
             .build())
         .toList();
   }
