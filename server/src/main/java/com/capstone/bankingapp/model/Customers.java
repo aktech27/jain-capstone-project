@@ -30,6 +30,10 @@ public class Customers {
   @Column(length = 11)
   private String cif;
 
+  @Builder.Default
+  @Column(name = "is_first_login")
+  private Boolean isFirstLogin = true;
+
   @Enumerated(EnumType.STRING)
   @Column(name = "customer_type")
   private CustomerType customerType;

@@ -13,9 +13,9 @@ import com.capstone.bankingapp.model.KycDetails.DocumentType;
 public interface KycRepository extends JpaRepository<KycDetails, Long> {
   Optional<KycDetails> findByDocNumberAndIsDeletedFalse(String docNumber);
 
-  List<KycDetails> findAllByCustomerInformationIdAndIsDeletedFalse(Long customerId);
+  List<KycDetails> findAllByCustomerInformationIdAndIsDeletedFalse(Long customerInfoId);
 
-  Optional<KycDetails> findByCustomerInformationIdAndDocumentTypeAndIsDeletedFalse(Long customerId,
+  Optional<KycDetails> findByCustomerInformationIdAndDocumentTypeAndIsDeletedFalse(Long customerInfoId,
       DocumentType documentType);
 
   boolean existsByDocNumberAndIsDeletedFalse(String docNumber);
@@ -26,6 +26,6 @@ public interface KycRepository extends JpaRepository<KycDetails, Long> {
 
   List<KycDetails> findByIsDeletedFalse();
 
-  List<KycDetails> findByCustomerInformationIdAndIsDeletedFalse(Long customerId);
+  List<KycDetails> findByCustomerInformationIdAndIsDeletedFalse(Long customerInfoId);
 
 }

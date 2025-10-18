@@ -43,7 +43,11 @@ public class SecurityConfig {
             .anyRequest().authenticated())
         .exceptionHandling(ex -> ex
             .authenticationEntryPoint((request, response, authException) -> {
-              response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: " + authException.getMessage());
+              response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+              response.setContentType("application/json");
+              String json = String.format("{\"success\": false, \"message\": \"%s\"}",
+                  "Unauthorized or invalid token");
+              response.getWriter().write(json);
             }))
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .build();
