@@ -3,6 +3,7 @@ package com.capstone.bankingapp.dto.request;
 import java.time.LocalDate;
 
 import com.capstone.bankingapp.model.CustomerInformation.Gender;
+import com.capstone.bankingapp.model.CustomerInformation.CustomerType;
 
 import lombok.Data;
 
@@ -20,6 +21,7 @@ public class CustomerRegisterRequest {
     private String phone;
     private LocalDate dob;
     private Gender gender;
+    private CustomerType customerType;
   }
 
   @Data

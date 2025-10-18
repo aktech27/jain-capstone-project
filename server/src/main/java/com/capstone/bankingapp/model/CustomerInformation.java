@@ -68,6 +68,10 @@ public class CustomerInformation {
   @Column(name = "nominee_phone")
   private String nomineePhone;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "customer_type")
+  private CustomerType customerType;
+
   @OneToOne(mappedBy = "customerInformation", fetch = FetchType.LAZY)
   private Customers customer;
 
@@ -88,5 +92,9 @@ public class CustomerInformation {
 
   public enum Gender {
     MALE, FEMALE
+  }
+
+  public enum CustomerType {
+    INDIVIDUAL, CORPORATE
   }
 }

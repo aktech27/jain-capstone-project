@@ -87,6 +87,7 @@ public class AuthService {
     newCustomer.setPhone(basicInfo.getPhone());
     newCustomer.setDob(basicInfo.getDob());
     newCustomer.setGender(basicInfo.getGender());
+    newCustomer.setCustomerType(basicInfo.getCustomerType());
 
     newCustomer.setNomineeName(nomineeDetails.getName());
     newCustomer.setNomineePhone(nomineeDetails.getPhone());
@@ -99,7 +100,7 @@ public class AuthService {
       throw new RuntimeException("Failed to serialize JSON fields", e);
     }
 
-    log.debug("Customer details : {}", newCustomer);
+    log.info("Customer details : {}", newCustomer);
     customerInformationRepository.save(newCustomer);
     log.info("Customer registered successfully with ID: {}", newCustomer.getId());
 
