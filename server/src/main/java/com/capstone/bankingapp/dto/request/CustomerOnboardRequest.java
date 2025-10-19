@@ -5,4 +5,5 @@ import lombok.Data;
 @Data
 public class CustomerOnboardRequest {
   private Long customerInformationId;
+  private Double initialDeposit;
 }

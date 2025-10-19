@@ -24,6 +24,7 @@ public class CustomerService {
   private final CustomersRepository customersRepository;
   private final KycRepository kycRepository;
   private final PasswordEncoder passwordEncoder;
+  private final AccountService accountService;
 
   public CustomerOnboardResponse onboardCustomer(CustomerOnboardRequest request) {
     Long infoId = request.getCustomerInformationId();
@@ -70,7 +71,9 @@ public class CustomerService {
         .customerInformation(customerInfo)
         .build();
 
-    customersRepository.save(customer);
+    Customers savedCustomer = customersRepository.save(customer);
+
+    accountService.createDefaultAccountForCustomer(savedCustomer.getId(), request.getInitialDeposit());
 
     log.info("Customer onboarded successfully with ID: {}", customer.getCustomerId());
 
