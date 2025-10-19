@@ -1,16 +1,20 @@
 package com.capstone.bankingapp.service;
 
 import com.capstone.bankingapp.dto.request.AdminLoginRequest;
+import com.capstone.bankingapp.dto.request.CustomerLoginRequest;
 import com.capstone.bankingapp.dto.request.CustomerRegisterRequest;
 import com.capstone.bankingapp.dto.request.CustomerRegisterRequest.AddressDetails;
 import com.capstone.bankingapp.dto.request.CustomerRegisterRequest.BasicInfo;
 import com.capstone.bankingapp.dto.request.CustomerRegisterRequest.NomineeDetails;
 import com.capstone.bankingapp.dto.response.AdminLoginResponse;
+import com.capstone.bankingapp.dto.response.CustomerLoginResponse;
 import com.capstone.bankingapp.dto.response.CustomerRegisterResponse;
 import com.capstone.bankingapp.model.AdminUser;
 import com.capstone.bankingapp.model.CustomerInformation;
+import com.capstone.bankingapp.model.Customers;
 import com.capstone.bankingapp.repository.AdminUserRepository;
 import com.capstone.bankingapp.repository.CustomerInformationRepository;
+import com.capstone.bankingapp.repository.CustomersRepository;
 import com.capstone.bankingapp.util.JwtUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +33,7 @@ import java.util.Optional;
 public class AuthService {
   private final AdminUserRepository adminUserRepository;
   private final CustomerInformationRepository customerInformationRepository;
+  private final CustomersRepository customersRepository;
   private final PasswordEncoder passwordEncoder;
   private final JwtUtil jwtUtil;
   private final ObjectMapper objectMapper;
@@ -105,5 +110,31 @@ public class AuthService {
     log.info("Customer registered successfully with ID: {}", newCustomer.getId());
 
     return new CustomerRegisterResponse(newCustomer.getId());
+  }
+
+  public CustomerLoginResponse authenticateCustomer(CustomerLoginRequest request) {
+    Optional<Customers> customerOpt = customersRepository.findByCif(request.getCif());
+
+    if (customerOpt.isEmpty()) {
+      throw new RuntimeException("Invalid CIF or Password");
+    }
+
+    Customers customer = customerOpt.get();
+
+    if (!passwordEncoder.matches(request.getPassword(), customer.getPassword())) {
+      throw new RuntimeException("Invalid CIF or Password");
+    }
+
+    Map<String, Object> payload = new HashMap<>();
+    payload.put("id", customer.getId());
+    payload.put("cif", customer.getCif());
+    payload.put("email", customer.getEmail());
+
+    String token = jwtUtil.generateToken(payload);
+
+    CustomerLoginResponse.CustomerDetails customerDetails = new CustomerLoginResponse.CustomerDetails(customer.getId(),
+        customer.getCif(), customer.getCustomerId(), customer.getIsFirstLogin(), customer.getCustomerType());
+
+    return new CustomerLoginResponse(token, customerDetails);
   }
 }

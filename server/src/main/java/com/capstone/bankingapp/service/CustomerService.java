@@ -1,6 +1,7 @@
 package com.capstone.bankingapp.service;
 
 import com.capstone.bankingapp.dto.request.CustomerOnboardRequest;
+import com.capstone.bankingapp.dto.request.CustomerUpdatePasswordRequest;
 import com.capstone.bankingapp.dto.response.CustomerOnboardResponse;
 import com.capstone.bankingapp.model.CustomerInformation;
 import com.capstone.bankingapp.model.Customers;
@@ -82,5 +83,23 @@ public class CustomerService {
         customer.getEmail(),
         customer.getPhone(),
         "Customer onboarded successfully. Temporary password generated internally.");
+  }
+
+  public String setCustomerPassword(CustomerUpdatePasswordRequest request) {
+    String cif = request.getCif();
+    log.info("Set new password for cif={}", cif);
+
+    Customers customer = customersRepository.findByCif(cif)
+        .orElseThrow(() -> new RuntimeException("Cif not found"));
+
+    String encodedPassword = passwordEncoder.encode(request.getNewPassword());
+
+    customer.setIsFirstLogin(false);
+    customer.setPassword(encodedPassword);
+    customersRepository.save(customer);
+
+    log.info("Customer password updated");
+
+    return "Updated";
   }
 }

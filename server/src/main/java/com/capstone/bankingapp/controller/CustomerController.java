@@ -1,6 +1,7 @@
 package com.capstone.bankingapp.controller;
 
 import com.capstone.bankingapp.dto.request.CustomerOnboardRequest;
+import com.capstone.bankingapp.dto.request.CustomerUpdatePasswordRequest;
 import com.capstone.bankingapp.dto.response.ApiResponse;
 import com.capstone.bankingapp.dto.response.CustomerOnboardResponse;
 import com.capstone.bankingapp.service.CustomerService;
@@ -23,6 +24,19 @@ public class CustomerController {
     try {
       CustomerOnboardResponse response = customerService.onboardCustomer(request);
       return ResponseEntity.ok(new ApiResponse<>(true, "Customer onboarded successfully", response));
+    } catch (Exception e) {
+      log.error("Error onboarding customer: {}", e.getMessage());
+      return ResponseEntity.badRequest()
+          .body(new ApiResponse<>(false, e.getMessage(), null));
+    }
+  }
+
+  @PostMapping("/set-new-password")
+  public ResponseEntity<ApiResponse<String>> setNewCustomerPassword(
+      @RequestBody CustomerUpdatePasswordRequest request) {
+    try {
+      String response = customerService.setCustomerPassword(request);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Customer password updated successfully", response));
     } catch (Exception e) {
       log.error("Error onboarding customer: {}", e.getMessage());
       return ResponseEntity.badRequest()
